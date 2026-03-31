@@ -1,4 +1,5 @@
 import { ArrowDownRight, ArrowUpRight, Wallet } from "lucide-react";
+import { WeatherStation } from "@/components/weather-station";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,22 +32,7 @@ export default function HomePage() {
     <main className="mx-auto min-h-screen max-w-[1700px] p-4 md:p-6">
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.15fr_1.6fr_1fr]">
         <section className="space-y-4 xl:order-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Weather Station</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="rounded-lg border border-border bg-muted/60 p-5">
-                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Current Temperature</p>
-                <p className="mt-2 text-5xl font-semibold text-teal-400">72°F</p>
-                <p className="mt-5 text-xs uppercase tracking-[0.18em] text-muted-foreground">Dew Point</p>
-                <p className="mt-2 text-3xl font-semibold">58°F</p>
-              </div>
-              <div className="flex h-[400px] items-center justify-center rounded-lg border border-dashed border-teal-500/40 bg-muted/40 text-center text-sm text-muted-foreground">
-                METAR Historical Trend Chart (400px)
-              </div>
-            </CardContent>
-          </Card>
+          <WeatherStation />
         </section>
 
         <section className="space-y-4 xl:order-2">
