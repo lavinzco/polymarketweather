@@ -2,12 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { CloudFog, Gauge, Search, Thermometer, Wind } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-type WeatherResponse = {
+export type WeatherResponse = {
   icao: string;
   temp_c: number | null;
   dewpoint_c: number | null;
@@ -51,7 +51,7 @@ function Metric({
   );
 }
 
-export function WeatherStation() {
+export function WeatherStation({ onWeatherUpdate }: { onWeatherUpdate?: (payload: WeatherResponse) => void }) {
   const [icaoInput, setIcaoInput] = useState(DEFAULT_ICAO);
   const [icao, setIcao] = useState(DEFAULT_ICAO);
 
@@ -60,6 +60,12 @@ export function WeatherStation() {
     queryFn: () => fetchWeather(icao),
     refetchInterval: 300_000,
   });
+
+  useEffect(() => {
+    if (data && onWeatherUpdate) {
+      onWeatherUpdate(data);
+    }
+  }, [data, onWeatherUpdate]);
 
   return (
     <Card>

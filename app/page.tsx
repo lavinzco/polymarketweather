@@ -1,19 +1,22 @@
-import { ArrowDownRight, ArrowUpRight, Wallet } from "lucide-react";
+"use client";
+
+import { useMemo, useState } from "react";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import { TradingPanel } from "@/components/trading-panel";
 import { WeatherStation } from "@/components/weather-station";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 
 const markets = [
-  { name: "NYC High > 70°F Tomorrow", yes: 0.61, no: 0.39, change: 4.8 },
-  { name: "Chicago Snowfall > 1in This Week", yes: 0.32, no: 0.68, change: -2.3 },
-  { name: "Miami Rain > 0.5in Today", yes: 0.56, no: 0.44, change: 1.2 },
-  { name: "LA Heat Advisory Before Friday", yes: 0.21, no: 0.79, change: -0.9 },
+  { name: "NYC High > 70°F Tomorrow", yes: 0.61, no: 0.39, change: 4.8, yesTokenId: "101001" },
+  { name: "Chicago Snowfall > 1in This Week", yes: 0.32, no: 0.68, change: -2.3, yesTokenId: "101002" },
+  { name: "Miami Rain > 0.5in Today", yes: 0.56, no: 0.44, change: 1.2, yesTokenId: "101003" },
+  { name: "LA Heat Advisory Before Friday", yes: 0.21, no: 0.79, change: -0.9, yesTokenId: "101004" },
 ];
 
 const positions = [
-  { market: "NYC High > 70°F Tomorrow", side: "YES", size: "$420", pnl: "+$38" },
-  { market: "Miami Rain > 0.5in Today", side: "NO", size: "$250", pnl: "-$12" },
+  { market: "NYC High > 70°F Tomorrow", side: "YES" as const, size: 420, pnl: "+$38" },
+  { market: "Miami Rain > 0.5in Today", side: "NO" as const, size: 250, pnl: "-$12" },
 ];
 
 function Trend({ value }: { value: number }) {
@@ -28,11 +31,17 @@ function Trend({ value }: { value: number }) {
 }
 
 export default function HomePage() {
+  const [selectedTokenId, setSelectedTokenId] = useState(markets[0].yesTokenId);
+  const [selectedMarketName, setSelectedMarketName] = useState(markets[0].name);
+  const [latestTempC, setLatestTempC] = useState<number | null>(null);
+
+  const selected = useMemo(() => markets.find((item) => item.yesTokenId === selectedTokenId) ?? markets[0], [selectedTokenId]);
+
   return (
     <main className="mx-auto min-h-screen max-w-[1700px] p-4 md:p-6">
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.15fr_1.6fr_1fr]">
         <section className="space-y-4 xl:order-1">
-          <WeatherStation />
+          <WeatherStation onWeatherUpdate={(payload) => setLatestTempC(payload.temp_c)} />
         </section>
 
         <section className="space-y-4 xl:order-2">
@@ -51,6 +60,19 @@ export default function HomePage() {
                     </div>
                     <Trend value={market.change} />
                   </div>
+                  <div className="mt-3 flex items-center gap-2">
+                    <Button
+                      type="button"
+                      className="h-8"
+                      onClick={() => {
+                        setSelectedTokenId(market.yesTokenId);
+                        setSelectedMarketName(market.name);
+                      }}
+                    >
+                      BUY YES
+                    </Button>
+                    <p className="text-xs text-muted-foreground">Token ID: {market.yesTokenId}</p>
+                  </div>
                 </article>
               ))}
             </CardContent>
@@ -58,45 +80,13 @@ export default function HomePage() {
         </section>
 
         <section className="space-y-4 xl:order-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>Trading Panel</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="rounded-lg border border-teal-500/35 bg-teal-500/10 p-3 text-sm">
-                <p className="flex items-center gap-2 font-medium text-teal-400">
-                  <Wallet className="size-4" /> Wallet Status
-                </p>
-                <p className="mt-1 text-muted-foreground">Connected · 0x82D...4aF1</p>
-              </div>
-
-              <form className="space-y-3">
-                <div>
-                  <label className="mb-2 block text-xs uppercase tracking-[0.16em] text-muted-foreground">Order Size (USDC)</label>
-                  <Input placeholder="100.00" />
-                </div>
-                <div>
-                  <label className="mb-2 block text-xs uppercase tracking-[0.16em] text-muted-foreground">Estimated Return</label>
-                  <Input placeholder="143.50" />
-                </div>
-                <Button type="button">Place Order</Button>
-              </form>
-
-              <div>
-                <p className="mb-2 text-xs uppercase tracking-[0.16em] text-muted-foreground">Current Positions</p>
-                <div className="space-y-2">
-                  {positions.map((position) => (
-                    <div key={position.market} className="rounded-md border border-border bg-muted/40 p-3 text-sm">
-                      <p className="font-medium">{position.market}</p>
-                      <p className="mt-1 text-muted-foreground">
-                        {position.side} · {position.size} · <span className={position.pnl.startsWith("+") ? "text-teal-400" : "text-rose-400"}>{position.pnl}</span>
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <TradingPanel
+            selectedTokenId={selectedTokenId}
+            selectedMarketName={selectedMarketName}
+            latestTempC={latestTempC}
+            positions={positions}
+          />
+          <p className="px-1 text-xs text-muted-foreground">Selected Market: {selected.name}</p>
         </section>
       </div>
     </main>
