@@ -1,0 +1,6 @@
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+weather_history.sqlite3
+node_modules/
